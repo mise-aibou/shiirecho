@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>仕入れ帳</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="仕入れ帳">
+<meta name="theme-color" content="#176248">
+<style>
+:root{color-scheme:light;--ink:#21382e;--green:#176248;--dark:#163d31;--line:#dce6df;--muted:#50685a;--ground:#f5f8f5;--red:#a53625;--red-bg:#faeae4;--blue:#24577b;--blue-bg:#e5eff7;--pale:#e7f1eb}
+*{box-sizing:border-box}
+body{margin:0;background:#e8eeea;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans CJK JP","Noto Sans Symbols 2",sans-serif;font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;min-height:44px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #428aaa;outline-offset:2px}
+button[hidden], [hidden]{display:none!important}
+h1,h2,h3,p{margin:0}
+h2{font-size:23px;line-height:1.35}
+h3{font-size:16px}
+.wrapper{max-width:880px;margin:auto;padding:22px 12px 30px}
+.demo{text-align:center;margin:0 auto 13px;color:var(--muted);font-size:12px}
+.demo h1{margin-bottom:4px;color:var(--ink);font-size:21px}
+.preview-nav{display:flex;flex-wrap:wrap;justify-content:center;margin:0 0 16px}
+.preview-nav button{margin:3px;padding:5px 11px;border:1px solid var(--line);border-radius:24px;background:white;font-size:12px;font-weight:700}
+.preview-nav button[aria-current],.primary{background:var(--green);border-color:var(--green);color:white}
+.phone{max-width:400px;margin:0 auto;border:5px solid #263b30;border-radius:30px;background:var(--ground);overflow:hidden;position:relative;box-shadow:0 12px 32px #243d381c}
+header{padding:16px 17px 15px;background:white;border-bottom:1px solid var(--line)}
+.brand{display:block;color:var(--muted);font-size:11px;font-weight:700;margin-bottom:3px}
+main{padding:14px;min-height:445px}
+nav.app-nav{display:flex;background:white;border-top:1px solid var(--line);padding:4px 6px 7px}
+.app-nav button{flex:1;background:white;border:0;font-size:12px;min-height:49px;color:var(--muted)}
+.app-nav button[aria-current]{color:var(--green);font-weight:800}
+.nav-icon{display:block;font-size:17px;line-height:1.2;margin-bottom:2px}
+.panel,.group,.notice,.summary{border:1px solid var(--line);border-radius:13px;background:white}
+.panel{padding:13px}
+.summary{padding:13px 14px;background:var(--dark);border-color:var(--dark);color:white;margin-bottom:12px}
+.summary small{color:#c7e4d1}
+.date-label{font-size:18px;font-weight:800}
+.summary-row,.between{display:flex;align-items:center;justify-content:space-between}
+.summary-row strong{font-size:24px}
+.notice{padding:10px 12px;margin:0 0 12px;color:var(--muted);font-size:13px}
+.notice.pending{background:var(--red-bg);border-color:var(--red-bg);color:var(--red);font-weight:800}
+.notice.good{background:var(--pale);border-color:var(--pale);color:var(--green)}
+.section{margin:15px 1px 7px;color:var(--muted);font-size:13px;font-weight:800}
+.group{overflow:hidden;margin-bottom:9px}
+.group-title{display:flex;align-items:center;justify-content:space-between;min-height:41px;padding:4px 11px;background:var(--pale);font-size:14px;font-weight:800}
+.row{display:flex;align-items:center;min-height:43px;padding:8px 11px;border-top:1px solid var(--line);background:white}
+.row:first-child{border-top:0}
+.item-name{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:800}
+.quantity{margin-left:8px;font-size:17px;font-weight:800;white-space:nowrap}
+.date-nav{display:flex;align-items:center;gap:6px;margin-top:4px}
+.date-nav button{min-width:44px;border:1px solid #ffffff55;border-radius:8px;background:transparent;color:white;font-size:18px;font-weight:800}
+.date-nav .date-label{flex:1;text-align:center}
+.date-pick{display:block;margin-top:8px;font-size:12px;color:#c7e4d1}
+.date-pick input{display:inline-block;width:auto;min-height:36px;margin-left:6px;padding:4px 8px}
+.closed{margin-top:6px;color:#ffd2c4;font-size:13px;font-weight:800}
+a.tel-link{color:var(--blue);font-weight:800}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);width:min(370px,calc(100% - 24px));display:flex;align-items:center;justify-content:space-between;gap:8px;background:#1d2b25;color:white;border-radius:12px;padding:6px 8px 6px 14px;font-size:14px;font-weight:700;z-index:5}
+.toast button{background:white;color:var(--green);border:0;border-radius:8px;padding:6px 12px;font-weight:800}
+.muted{color:var(--muted);font-size:12px}
+.btn{width:100%;border:1px solid #afc8b8;border-radius:10px;padding:8px 11px;font-weight:800;background:white;color:var(--green)}
+.btn.primary{background:var(--green);border-color:var(--green);color:white}
+.btn + .btn{margin-top:7px}
+.btn.red{color:var(--red);background:var(--red-bg);border-color:var(--red-bg)}
+.btn.blue{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-bg)}
+.actions{margin-top:13px}
+.chip{display:inline-block;border-radius:7px;background:#eef3ef;padding:5px 9px;color:#42594b;font-size:14px;font-weight:800;white-space:nowrap}
+.chip.bought,.phone-toggle.called{background:var(--green);color:white}
+.chip.missed{background:var(--red-bg);color:var(--red)}
+.chip.substitute{background:var(--blue-bg);color:var(--blue)}
+.phone-toggle,.row-action{background:white;border:1px solid #afc8b8;border-radius:8px;font-size:12px;padding:5px 8px;font-weight:800;color:var(--green)}
+.phone-toggle{min-width:91px;color:var(--red);border-color:#d49689}
+.phone-toggle.called{border-color:var(--green)}
+.row-action{min-width:44px;margin-left:7px;font-size:16px}
+.buy-row{padding:5px 7px 5px 10px}
+.buy-row .quantity{display:block;margin:1px 0}
+.status-button{border:1px solid var(--line);border-radius:8px;background:white;min-width:97px;margin-left:6px;padding:4px}
+.subnote{display:block;color:var(--blue);font-size:12px;overflow-wrap:anywhere}
+.filters{display:flex;background:var(--pale);border-radius:9px;padding:3px;margin-bottom:10px}
+.filters button{flex:1;padding:3px;background:transparent;border:0;border-radius:7px;font-size:12px;color:var(--muted);font-weight:700}
+.filters button[aria-pressed=true]{background:white;color:var(--green)}
+.track{height:6px;border-radius:5px;background:#ffffff30;margin-top:8px;overflow:hidden}
+.track div{height:100%;background:#96d2a5}
+.field{margin-bottom:13px;min-width:0}
+label,.legend{display:block;font-size:14px;font-weight:800;margin-bottom:5px}
+.required{margin-left:5px;color:var(--red);font-size:11px}
+.optional{margin-left:5px;color:var(--muted);font-size:11px;font-weight:400}
+input,select,textarea{display:block;width:100%;min-height:44px;padding:7px 10px;border:1px solid #bfcfc5;border-radius:8px;background:white}
+textarea{min-height:68px;resize:vertical}
+.cols{display:grid;grid-template-columns:1fr 1fr;grid-gap:9px}
+.helper{display:block;margin-top:3px;color:var(--muted);font-size:12px}
+.suggestions{display:flex;flex-wrap:wrap;margin-top:4px}
+.suggestions button{margin:0 4px 4px 0;padding:5px 10px;border:1px solid #bbd0c2;border-radius:8px;background:var(--pale);font-size:13px}
+.status-controls .btn{margin-top:6px}
+.text-action{display:block;margin:5px auto 0;border:0;background:transparent;color:var(--green);text-decoration:underline;font-size:13px}
+.text-action.delete{color:var(--red)}
+.stats{display:grid;grid-template-columns:1fr 1fr;grid-gap:7px;margin:10px 0}
+.stats div{padding:8px;background:white;border:1px solid var(--line);border-radius:9px;text-align:center;font-size:12px}
+.stats strong{display:block;font-size:22px;color:var(--green)}
+.done-panel{text-align:center}
+.done-panel h3{color:var(--green);font-size:19px}
+.radio-choice{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0;background:white;border:1px solid var(--line);border-radius:8px}
+.radio-choice input{margin:0 6px 0 0;display:inline;width:auto;min-height:0;accent-color:var(--green)}
+.error{display:block;color:var(--red);font-size:13px;margin-top:5px}
+.layer{position:absolute;top:0;right:0;bottom:0;left:0;background:#172a2588;display:flex;justify-content:center;align-items:center;padding:12px}
+.dialog{width:100%;background:white;max-height:95%;overflow:auto;border-radius:16px;padding:16px}
+.dialog h3{margin-bottom:7px}
+.dialog .group{margin-top:11px}
+.dialog .notice{margin-top:10px}
+@media(max-width:430px){.wrapper{padding:10px 0 20px}.phone{border:0;border-radius:0;box-shadow:none;overflow:visible}.app-nav{position:sticky;bottom:0}.preview-nav{margin-bottom:8px}main{min-height:0}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="phone">
+    <header><span class="brand" id="brand"></span><h2 id="screen-title"></h2></header>
+    <main id="screen"></main>
+    <nav class="app-nav" aria-label="メインメニュー"></nav>
+    <div class="layer" id="layer" hidden></div>
+    <div class="toast" id="toast" role="status" hidden><span id="toast-text"></span><button data-action="undo">取り消す</button></div>
+  </div>
+</div>
+<script>
+'use strict';
+
+const viewTitle = {
+  plan:'仕入れ帳', add:'食材を追加', buy:'買い物チェック',
+  finish:'仕入れ結果', suppliers:'設定'
+};
+const statusTitle = {pending:'未', bought:'買った', missed:'買えなかった', substitute:'代わりに買った'};
+const unitChoices = ['匹','本','個','玉','kg','g','パック','ケース','袋','箱','束'];
+// 店名・仕入先は最初は空。使う人が「設定」で登録する
+let shopName = '';
+let priorNames = [];
+let suppliers = [];
+// 仕入れ日ごとに「食材」と「電話済み」を分けて持つ（前の日の電話済みが残らないように）
+let book = {};
+let items = [];
+let called = new Set();
+let nextId = 1;
+
+// ===== 保存（このiPhoneの中だけに保存。ログイン・通信なし） =====
+const STORE_KEY = 'shiirecho-data-v1';
+let storageOK = true;
+function snapshot() {
+  const days = {};
+  Object.keys(book).forEach(k => {
+    if (book[k].items.length) days[k] = {items:book[k].items, called:[...book[k].called]};
+  });
+  return {app:'明日の仕入れ帳', version:1, savedAt:new Date().toISOString(), shopName, nextId, priorNames, suppliers, days};
+}
+function applyData(data) {
+  if (!data || data.app !== '明日の仕入れ帳' || !Array.isArray(data.suppliers) || typeof data.days !== 'object') throw new Error('形式が違います');
+  suppliers = data.suppliers;
+  shopName = typeof data.shopName === 'string' ? data.shopName : '';
+  priorNames = Array.isArray(data.priorNames) ? data.priorNames : [];
+  nextId = Number(data.nextId) || 1;
+  book = {};
+  Object.keys(data.days).forEach(k => {
+    const d = data.days[k];
+    book[k] = {items:Array.isArray(d.items) ? d.items : [], called:new Set(Array.isArray(d.called) ? d.called : [])};
+    book[k].items.forEach(i => { if (i.id >= nextId) nextId = i.id + 1; });
+  });
+}
+function saveAll() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(snapshot())); storageOK = true; }
+  catch (e) { storageOK = false; }
+}
+function loadAll() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) applyData(JSON.parse(raw));
+  } catch (e) { storageOK = false; }
+}
+loadAll();
+// iPhoneがデータを勝手に消さないようにお願いする（対応している場合のみ）
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+let view = 'plan';
+let filter = 'all';
+let activeItem = 1;
+let addBack = 'plan';
+let editingId = null;
+let activeSupplier = null;
+let dialogTrigger = null;
+let buyScroll = 0;
+
+// 定休日：毎週水・木、毎月第2火曜（2店舗共通）
+const DAY_CUTOFF_HOUR = 5; // 朝5時までは前の日として扱う（夜0時過ぎの登録対策）
+function isClosed(d) {
+  const w = d.getDay();
+  return w === 3 || w === 4 || (w === 2 && d.getDate() >= 8 && d.getDate() <= 14);
+}
+function shiftBusinessDay(from, step) {
+  const d = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  do { d.setDate(d.getDate() + step); } while (isClosed(d));
+  return d;
+}
+function baseToday(now = new Date()) {
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (now.getHours() < DAY_CUTOFF_HOUR) d.setDate(d.getDate() - 1);
+  return d;
+}
+const fmtDate = d => (d.getMonth()+1) + '月' + d.getDate() + '日（' + '日月火水木金土'[d.getDay()] + '）';
+const isoDate = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+const autoDay = shiftBusinessDay(baseToday(), 1);
+let day = autoDay;
+let shortDate = fmtDate(day);
+function setDay(d) {
+  day = d; shortDate = fmtDate(d);
+  const key = isoDate(d);
+  if (!book[key]) book[key] = {items:[], called:new Set()};
+  items = book[key].items; called = book[key].called;
+}
+setDay(autoDay);
+const root = document.querySelector('#screen');
+const layer = document.querySelector('#layer');
+const title = document.querySelector('#screen-title');
+const nav = document.querySelector('.app-nav');
+const escapeHtml = value => String(value == null ? '' : value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const seller = id => suppliers.find(entry => entry.id === id);
+const planned = item => escapeHtml(item.quantity ? item.quantity + (item.unit || '') : '数量未定');
+const actual = item => escapeHtml(item.actual ? item.actual + (item.actualUnit || '') : '');
+const stateCount = state => items.filter(i => i.state === state).length;
+const pendingItems = () => items.filter(i => i.state === 'pending');
+const label = (name, required = false) => escapeHtml(name) + (required ? '<span class="required">必須</span>' : '<span class="optional">任意</span>');
+const button = (text, action, style = '') => '<button class="btn ' + style + '" data-action="' + action + '">' + text + '</button>';
+const head = (name, extra = '') => '<div class="group-title"><span>' + escapeHtml(name) + '</span>' + extra + '</div>';
+const chip = state => '<span class="chip ' + state + '">' + statusTitle[state] + '</span>';
+
+function supplierGroups(list, row, heading) {
+  return ['市場','市場以外'].map(area => {
+    const groups = suppliers.filter(s => s.area === area).map(s => {
+      const entries = list.filter(item => item.supplier === s.id);
+      return entries.length ? '<section class="group">' + heading(s) + entries.map(row).join('') + '</section>' : '';
+    }).join('');
+    return groups ? '<h3 class="section">' + area + '</h3>' + groups : '';
+  }).join('');
+}
+
+function renderPlan() {
+  const listed = suppliers.filter(s => items.some(item => item.supplier === s.id));
+  // 取り置きの電話は品物ごと
+  const outstanding = items.filter(i => i.call && !called.has(i.id)).length;
+  const isAuto = isoDate(day) === isoDate(autoDay);
+  const summary = '<div class="summary"><small>' + (isAuto ? '次の営業日（自動）' : '手で変更した仕入れ日') + '</small>' +
+    '<div class="date-nav"><button data-action="day:-1" aria-label="前の営業日">‹</button><p class="date-label">' + shortDate +
+    'の購入予定</p><button data-action="day:1" aria-label="次の営業日">›</button></div>' +
+    (isClosed(day) ? '<p class="closed">この日は定休日です</p>' : '') +
+    '<label class="date-pick">日付を選ぶ<input type="date" id="day-pick" value="' + isoDate(day) + '"></label>' +
+    (isAuto ? '' : '<button class="text-action" style="color:#c7e4d1" data-action="day:auto">次の営業日に戻す</button>') +
+    '<div class="summary-row"><strong>' + items.length + '品</strong><small>仕入先 ' + listed.length + 'か所</small></div></div>';
+  const notice = '<p class="notice ' + (outstanding ? 'pending' : 'good') + '" role="status">取り置きの電話が残っている品物：' + outstanding + '品</p>';
+  const groups = supplierGroups(items,
+    item => '<div class="row"><span class="item-name">' + escapeHtml(item.name) + (item.note ? '<small class="helper">' + escapeHtml(item.note) + '</small>' : '') + '</span><span class="quantity">' + planned(item) + '</span>' +
+      (item.call ? '<button class="phone-toggle ' + (called.has(item.id) ? 'called' : '') + '" style="margin-left:8px" data-action="call:' + item.id + '" aria-label="' + escapeHtml(item.name) + 'の電話状況">' + (called.has(item.id) ? '✓ 電話済み' : '☎ 電話する') + '</button>' : '') +
+      '<button class="row-action" data-action="plan-edit:' + item.id + '" aria-label="' + escapeHtml(item.name) + 'の登録内容を変更・削除">…</button></div>',
+    s => head(s.name));
+  return summary + notice + (groups || '<p class="panel">購入予定の食材はありません。</p>') +
+    '<div class="actions">' + button('＋ 食材を追加','add','primary') + button('買い物チェックへ','buy') + '</div>';
+}
+
+function unitControl(prefix, unit = '') {
+  const known = !unit || unitChoices.includes(unit);
+  return '<select id="' + prefix + '-unit" name="unit" data-unit="' + prefix + '" aria-label="単位の候補">' +
+    '<option value="">単位を選ぶ</option>' + unitChoices.map(v => '<option' + (v === unit ? ' selected' : '') + '>' + v + '</option>').join('') +
+    '<option value="custom"' + (!known ? ' selected' : '') + '>その他（手入力）</option></select>' +
+    '<input id="' + prefix + '-custom" name="custom" aria-label="単位を手入力" maxlength="18" placeholder="単位を入力" value="' +
+    (known ? '' : escapeHtml(unit)) + '"' + (known ? ' hidden' : '') + '>';
+}
+
+// editingId があるときは「登録内容の変更」、ないときは新しく登録
+function renderAdd() {
+  if (!suppliers.length) return '<p class="notice pending">先に仕入先を登録してください。</p>' +
+    button('設定で仕入先を登録する','suppliers','primary') + button('戻る',addBack);
+  const it = editingId ? items.find(i => i.id === editingId) : null;
+  const v = key => escapeHtml(it && it[key] ? it[key] : '');
+  return '<p class="notice">仕入れ日　<strong>' + shortDate + '</strong></p><form id="add-form">' +
+    '<div class="field"><label for="food-name">' + label('食材名',true) + '</label><input id="food-name" name="food" required maxlength="60" autocomplete="off" placeholder="例：キャベツ" value="' + v('name') + '">' +
+    '<small id="suggestion-label" class="helper">以前使った食材名</small><div id="food-suggestions" class="suggestions"></div></div>' +
+    '<div class="field"><label for="food-supplier">' + label('仕入先',true) + '</label><select id="food-supplier" name="supplier" required>' +
+    '<option value="">仕入先を選ぶ</option>' + suppliers.map(s => '<option value="' + s.id + '"' + (it && it.supplier === s.id ? ' selected' : '') + '>' + escapeHtml(s.area + ' ／ ' + s.name) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label class="radio-choice" style="justify-content:flex-start;padding:0 12px"><input type="checkbox" name="call" value="yes"' + (it && it.call ? ' checked' : '') + '>☎ この品物は取り置きの電話をする</label></div>' +
+    '<div class="cols"><div class="field"><label for="food-quantity">' + label('予定数量') + '</label><input id="food-quantity" name="quantity" inputmode="decimal" maxlength="12" placeholder="例：5" value="' + v('quantity') + '"></div>' +
+    '<div class="field"><label for="add-unit">' + label('単位') + '</label>' + unitControl('add', it ? it.unit || '' : '') + '</div></div>' +
+    '<div class="field"><label for="food-note">' + label('メモ') + '</label><textarea id="food-note" name="note" maxlength="160" placeholder="例：大きめのもの">' + v('note') + '</textarea></div>' +
+    (it ? '<button class="btn primary" value="return">変更を保存する</button></form>' +
+          '<button class="text-action delete" data-action="delete-plan">この品物を削除</button>' :
+          '<button class="btn primary" value="return">登録する</button><button class="btn" value="continue">登録して続ける</button></form>') +
+    button('戻る',addBack);
+}
+
+function showSuggestions() {
+  const input = document.querySelector('#food-name');
+  if (!input) return;
+  const text = input.value.trim();
+  const matches = priorNames.filter(name => name !== text && (!text || name.includes(text))).slice(0,3);
+  document.querySelector('#suggestion-label').hidden = !matches.length;
+  document.querySelector('#food-suggestions').innerHTML = matches.map(name =>
+    '<button type="button" data-action="suggest:' + escapeHtml(name) + '">' + escapeHtml(name) + '</button>').join('');
+}
+
+function renderBuy() {
+  const unresolved = stateCount('pending');
+  const checked = items.length - unresolved;
+  const visible = filter === 'all' ? items : items.filter(item => (item.state === 'pending') === (filter === 'pending'));
+  const summary = '<div class="summary"><p>' + shortDate + '</p><div class="summary-row"><small>確認済み</small><strong>' +
+    checked + ' / ' + items.length + '品</strong></div><div class="track"><div style="width:' + (items.length ? 100 * checked / items.length : 0) + '%"></div></div></div>';
+  const tabs = '<div class="filters" aria-label="食材の表示">' +
+    [['all','すべて',items.length],['pending','未',unresolved],['checked','確認済み',checked]].map(([key,name,count]) =>
+      '<button data-action="filter:' + key + '" aria-pressed="' + (filter === key) + '">' + name + ' ' + count + '</button>').join('') + '</div>';
+  const groups = supplierGroups(visible, item =>
+    '<div class="row buy-row"><span class="item-name">' + escapeHtml(item.name) + '<span class="quantity">' +
+    (item.state === 'bought' && item.actual ? actual(item) : planned(item)) + '</span>' +
+    (item.state === 'substitute' ? '<small class="subnote">→ ' + escapeHtml(item.memo) + '</small>' : '') + '</span>' +
+    '<button class="status-button" data-action="' + (item.state === 'pending' ? 'quick-buy:' : 'edit:') + item.id + '" aria-label="' + escapeHtml(item.name) + '：' + statusTitle[item.state] + (item.state === 'pending' ? '。押すと「買った」にする' : '。状態を変更') + '">' + chip(item.state) + '</button>' +
+    '<button class="row-action" data-action="edit:' + item.id + '" aria-label="' + escapeHtml(item.name) + 'の詳細">…</button></div>',
+    s => head(s.name));
+  return summary + tabs + (groups || '<p class="panel">表示する食材はありません。</p>') + '<div class="actions">' +
+    button('仕入れ終了へ','finish','primary') + button('＋ 予定外の食材を追加','add') + '</div>';
+}
+
+function renderEdit() {
+  const item = items.find(entry => entry.id === activeItem);
+  if (!item) return '<p class="notice">買い物チェックから食材を選んでください。</p>' + button('買い物チェックへ','buy','primary');
+  const actualQuantity = item.actual != null ? item.actual : (item.state === 'pending' ? item.quantity : '');
+  const displayUnit = item.actualUnit != null ? item.actualUnit : (item.state === 'pending' ? item.unit : '');
+  return '<div class="panel"><div class="between"><h3 id="dialog-title">' + escapeHtml(item.name) + '</h3>' + chip(item.state) +
+    '</div><p class="muted">' + escapeHtml(seller(item.supplier).area + ' ／ ' + seller(item.supplier).name) +
+    '　予定：' + planned(item) + '</p>' + (item.note ? '<p class="helper">予定時のメモ　' + escapeHtml(item.note) + '</p>' : '') + '</div><div class="actions"><form id="edit-form">' +
+    '<div class="cols"><div class="field"><label for="actual-quantity">' + label('購入数量') +
+    '</label><input id="actual-quantity" name="actual" inputmode="decimal" maxlength="12" value="' + escapeHtml(actualQuantity) + '"></div>' +
+    '<div class="field"><label for="edit-unit">' + label('購入単位') + '</label>' + unitControl('edit',displayUnit) + '</div></div>' +
+    '<div class="field"><label for="purchase-note">' + label('購入メモ') + '</label><textarea id="purchase-note" name="memo" maxlength="160" placeholder="例：白菜 2玉（キャベツ高値）">' +
+    escapeHtml(item.memo || '') + '</textarea><small class="helper">「代わりに買った」を選ぶときは、代わりの品をメモしてください。</small><small id="memo-error" class="error" role="alert" hidden></small></div>' +
+    '<div class="status-controls"><button class="btn primary" value="bought">✓ 買った</button>' +
+    '<button class="btn red" value="missed">× 買えなかった</button><button class="btn blue" value="substitute">⇄ 代わりに買った</button>' +
+    (item.state !== 'pending' ? '<button class="btn" value="pending">「未」に戻す</button>' : '') +
+    '</div></form>' + '<button class="text-action" data-action="close">閉じる</button>' +
+    '<p class="helper" style="text-align:center">品物の削除は「仕入れ帳」の「…」からできます。</p></div>';
+}
+
+function renderFinish() {
+  const results = supplierGroups(items, item =>
+    '<div class="row"><span class="item-name">' + escapeHtml(item.name) +
+    (item.state === 'bought' && item.actual ? '<small class="helper">購入 ' + actual(item) + '</small>' : '') +
+    (item.memo ? '<small class="helper">' + escapeHtml(item.memo) + '</small>' : '') + '</span>' + chip(item.state) + '</div>',
+    s => head(s.name));
+  return '<div class="panel done-panel"><h3>✓ 仕入れチェック完了</h3><p class="muted">' + shortDate + '</p></div>' +
+    '<div class="stats">' + Object.keys(statusTitle).map(state => '<div><strong>' + stateCount(state) + '</strong>' + statusTitle[state] + '</div>').join('') +
+    '</div>' + results + '<div class="actions">' + button('仕入れ帳に戻る','plan','primary') + button('買い物チェックに戻る','buy') + '</div>';
+}
+
+function renderSuppliers() {
+  return '<h3 class="section" style="margin-top:0">お店の名前</h3><form id="shop-form" class="panel">' +
+    '<label for="shop-name" class="muted" style="font-weight:400">画面の上に表示されます（空でもOK）</label>' +
+    '<input id="shop-name" name="shop" maxlength="40" placeholder="例：〇〇亭" value="' + escapeHtml(shopName) + '">' +
+    '<button class="btn primary" style="margin-top:8px">お店の名前を保存</button></form>' +
+    '<h3 class="section">仕入先</h3>' +
+    (suppliers.length ? '' : '<p class="notice pending">まだ仕入先がありません。下の「＋ 仕入先を追加」から登録してください。</p>') +
+    '<p class="notice">名前・分類・電話番号を変更できます。取り置きの電話は、食材を登録するときに品物ごとに選びます。</p>' +
+    ['市場','市場以外'].filter(area => suppliers.some(s => s.area === area)).map(area => '<h3 class="section">' + area + '</h3><div class="group">' +
+    suppliers.filter(s => s.area === area).map(s => '<div class="row"><span class="item-name">' + escapeHtml(s.name) +
+      (s.phone ? '<small class="helper">☎ <a class="tel-link" href="tel:' + escapeHtml(s.phone.replace(/[^0-9+]/g,'')) + '">' + escapeHtml(s.phone) + '</a></small>' : '') +
+      '</span><button class="row-action" data-action="supplier:' + s.id + '" aria-label="' + escapeHtml(s.name) + 'を編集">編集</button></div>').join('') + '</div>').join('') +
+    '<div class="actions">' + button('＋ 仕入先を追加','new-supplier','primary') + '</div>' +
+    '<h3 class="section">バックアップ</h3><div class="panel"><p class="muted" style="margin-bottom:8px">データはこのiPhoneの中だけに保存されています。機種変更や故障に備えて、ときどき書き出してください（「ファイル」アプリに保存されます）。</p>' +
+    button('バックアップを書き出す','export') +
+    '<label class="btn" style="display:block;text-align:center;margin-top:7px">バックアップから戻す<input type="file" id="import-file" accept=".json,application/json" hidden></label></div>';
+}
+
+function render() {
+  const screens = {plan:renderPlan,add:renderAdd,buy:renderBuy,edit:renderEdit,finish:renderFinish,suppliers:renderSuppliers};
+  title.textContent = view === 'add' && editingId ? '登録内容の変更' : viewTitle[view];
+  root.innerHTML = screens[view]();
+  document.querySelector('#brand').textContent = shopName || '仕入れ帳';
+  saveAll();
+  if (!storageOK) root.insertAdjacentHTML('afterbegin', '<p class="notice pending">保存できていません。Safariの「プライベート」をオフにして開き直してください。</p>');
+  const section = view === 'add' ? addBack : ((view === 'edit' || view === 'finish') ? 'buy' : view);
+  nav.innerHTML = [['plan','≡','仕入れ帳'],['buy','☑','買い物'],['suppliers','⚙','設定']].map(([key,icon,name]) =>
+    '<button data-action="' + key + '"' + (key === section ? ' aria-current="page"' : '') + '><span class="nav-icon" aria-hidden="true">' + icon + '</span>' + name + '</button>').join('');
+  if (view === 'add') showSuggestions();
+}
+
+function navigate(target, preserveScroll = false) {
+  closeDialog(false);
+  if (target !== 'add') editingId = null;
+  view = target;
+  render();
+  window.scrollTo(0,preserveScroll ? buyScroll : 0);
+}
+
+// ===== バックアップ =====
+let pendingImport = null;
+async function exportBackup() {
+  saveAll();
+  const name = '仕入れ帳バックアップ_' + isoDate(new Date()) + '.json';
+  const blob = new Blob([JSON.stringify(snapshot(), null, 1)], {type:'application/json'});
+  const file = typeof File === 'function' ? new File([blob], name, {type:'application/json'}) : null;
+  // iPhoneでは「共有」から「ファイルに保存」を選べる形が確実
+  if (file && navigator.canShare && navigator.canShare({files:[file]})) {
+    try { await navigator.share({files:[file], title:name}); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function readImport(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || data.app !== '明日の仕入れ帳') throw new Error('仕入れ帳のバックアップではありません');
+      pendingImport = data;
+      const count = Object.values(data.days || {}).reduce((n, d) => n + (d.items ? d.items.length : 0), 0);
+      openDialog('<h3 id="dialog-title">バックアップから戻しますか？</h3>' +
+        '<p class="notice">書き出した日時：' + escapeHtml(String(data.savedAt || '').slice(0,16).replace('T',' ')) + '<br>品物：' + count + '件</p>' +
+        '<p class="notice pending">今このiPhoneに入っている内容は、バックアップの内容に置きかわります。</p>' +
+        button('キャンセル','close','primary') + button('戻す','confirm-import','red'));
+    } catch (e) {
+      openDialog('<h3 id="dialog-title">読み込めませんでした</h3><p class="notice">' + escapeHtml(e.message) + '</p>' + button('閉じる','close','primary'));
+    }
+  };
+  reader.readAsText(file);
+}
+
+let undoAction = null;
+let undoTimer = null;
+function showUndo(text, fn) {
+  undoAction = fn;
+  document.querySelector('#toast-text').textContent = text;
+  document.querySelector('#toast button').hidden = !fn;
+  document.querySelector('#toast').hidden = false;
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(hideUndo, 5000);
+}
+function hideUndo() {
+  undoAction = null;
+  clearTimeout(undoTimer);
+  document.querySelector('#toast').hidden = true;
+}
+
+function openDialog(contents) {
+  dialogTrigger = document.activeElement;
+  layer.innerHTML = '<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" tabindex="-1">' + contents + '</div>';
+  layer.hidden = false;
+  const phone = document.querySelector('.phone');
+  const dialog = layer.firstElementChild;
+  // In a long screen, align the dialog near the user's viewport rather than the document midpoint.
+  const phoneBox = phone.getBoundingClientRect();
+  const visibleTop = Math.max(0, -phoneBox.top);
+  const visibleBottom = Math.min(phoneBox.height, window.innerHeight - phoneBox.top);
+  const available = Math.max(0, visibleBottom - visibleTop);
+  dialog.style.maxHeight = Math.max(180, available - 24) + 'px';
+  dialog.style.position = 'absolute';
+  dialog.style.left = '12px';
+  dialog.style.right = '12px';
+  dialog.style.width = 'auto';
+  dialog.style.top = Math.round(Math.max(12, Math.min(phoneBox.height - dialog.offsetHeight - 12,
+    visibleTop + (available - dialog.offsetHeight) / 2))) + 'px';
+  dialog.focus({preventScroll:true});
+}
+
+function closeDialog(restore = true) {
+  if (layer.hidden) return;
+  layer.hidden = true;
+  layer.innerHTML = '';
+  if (restore && dialogTrigger && document.contains(dialogTrigger)) dialogTrigger.focus({preventScroll:true});
+  dialogTrigger = null;
+}
+
+function finishCheck() {
+  if (view !== 'buy') navigate('buy');
+  const unresolved = pendingItems();
+  if (!items.length) {
+    openDialog('<h3 id="dialog-title">仕入れ対象の食材がありません</h3>' + button('戻る','close','primary'));
+    return;
+  }
+  if (!unresolved.length) {
+    navigate('finish');
+    return;
+  }
+  openDialog('<h3 id="dialog-title" style="color:var(--red)">まだ' + unresolved.length + '品チェックしていません</h3>' +
+    '<p class="muted">買い忘れがないか確認してください。</p><div class="group">' + unresolved.map(item =>
+      '<div class="row"><span class="item-name">' + escapeHtml(item.name) + '</span><span class="muted">' +
+      escapeHtml(seller(item.supplier).name) + ' ・ ' + planned(item) + '</span></div>').join('') + '</div>' +
+    button('戻ってチェックする','return-pending','primary'));
+}
+
+function openSupplier(id) {
+  activeSupplier = id ? seller(id) : null;
+  const s = activeSupplier || {name:'', area:'市場以外', call:false, phone:''};
+  openDialog('<h3 id="dialog-title">' + (id ? '仕入先を編集' : '仕入先を追加') + '</h3><form id="supplier-form">' +
+    '<div class="field"><label for="supplier-name">' + label('仕入先名',true) + '</label><input id="supplier-name" name="name" required maxlength="45" value="' + escapeHtml(s.name) + '"></div>' +
+    '<div class="field"><label for="supplier-area">分類</label><select id="supplier-area" name="area">' +
+    ['市場','市場以外'].map(area => '<option' + (area === s.area ? ' selected' : '') + '>' + area + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label for="supplier-phone">' + label('電話番号') + '</label><input id="supplier-phone" type="tel" name="phone" maxlength="26" value="' + escapeHtml(s.phone) + '" placeholder="電話番号を入力"></div>' +
+    '<button class="btn primary">保存する</button></form><div class="actions">' + button('閉じる','close') + '</div>');
+}
+
+function openCall(id) {
+  const item = items.find(i => i.id === id);
+  const s = seller(item.supplier);
+  const alreadyCalled = called.has(id);
+  const details = s.phone ? '<p class="notice">電話番号　<a class="tel-link" href="tel:' + escapeHtml(s.phone.replace(/[^0-9+]/g,'')) + '">☎ ' + escapeHtml(s.phone) + '（押すと発信）</a></p>' :
+    '<p class="notice">電話番号が未登録でも、取り置きの電話を済ませたら記録できます。</p>';
+  openDialog('<h3 id="dialog-title">' + escapeHtml(item.name) + '（' + planned(item) + '）の取り置き電話</h3><p class="muted" style="margin-bottom:8px">仕入先：' + escapeHtml(s.area + ' ／ ' + s.name) + '</p>' + details +
+    (alreadyCalled ? button('「電話する」に戻す','toggle-call:' + id,'primary') :
+      '<p class="muted" style="margin-bottom:10px">電話が終わってから「電話済みにする」を押してください。</p>' +
+      button('✓ 電話済みにする','toggle-call:' + id,'primary')) + button('閉じる','close'));
+}
+
+function action(command) {
+  const [name,...rest] = command.split(':');
+  const parameter = rest.join(':');
+  switch (name) {
+    case 'plan': case 'buy': case 'suppliers':
+      navigate(name, name === 'buy' && view === 'edit');
+      break;
+    case 'add':
+      editingId = null;
+      addBack = view === 'buy' ? 'buy' : 'plan';
+      navigate('add');
+      break;
+    case 'plan-edit':
+      editingId = Number(parameter);
+      addBack = 'plan';
+      navigate('add');
+      break;
+    case 'delete-plan':
+      openDialog('<h3 id="dialog-title">「' + escapeHtml(items.find(i => i.id === editingId).name) + '」を削除しますか？</h3>' +
+        '<p class="notice">この仕入れ日の一覧から削除されます。</p>' +
+        button('キャンセル','close','primary') + button('削除する','confirm-delete-plan','red'));
+      break;
+    case 'confirm-delete-plan':
+      items.splice(items.findIndex(i => i.id === editingId),1);
+      called.delete(editingId);
+      editingId = null;
+      navigate('plan');
+      break;
+    case 'edit':
+      // 画面を切り替えず、③の上にパネルで出す
+      activeItem = Number(parameter);
+      buyScroll = window.scrollY;
+      openDialog(renderEdit());
+      break;
+    case 'quick-buy': {
+      // 1タップで「買った」（予定どおりの数量）。数秒だけ取り消せる
+      const it = items.find(i => i.id === Number(parameter));
+      const before = {state:it.state, actual:it.actual, actualUnit:it.actualUnit, memo:it.memo};
+      Object.assign(it, {state:'bought', actual:it.quantity || '', actualUnit:it.unit || ''});
+      render();
+      showUndo(it.name + 'を「買った」にしました', () => { Object.assign(it, before); render(); });
+      break;
+    }
+    case 'undo':
+      if (undoAction) undoAction();
+      hideUndo();
+      break;
+    case 'day':
+      setDay(parameter === 'auto' ? autoDay : shiftBusinessDay(day, Number(parameter)));
+      render();
+      break;
+    case 'filter':
+      filter = parameter;
+      render();
+      break;
+    case 'finish':
+      finishCheck();
+      break;
+    case 'return-pending':
+      filter = 'pending';
+      navigate('buy');
+      break;
+    case 'suggest':
+      document.querySelector('#food-name').value = parameter;
+      showSuggestions();
+      break;
+    case 'call': openCall(Number(parameter)); break;
+    case 'toggle-call':
+      if (called.has(Number(parameter))) called.delete(Number(parameter));
+      else called.add(Number(parameter));
+      closeDialog();
+      render();
+      document.querySelector('[data-action="call:' + parameter + '"]').focus({preventScroll:true});
+      break;
+    case 'supplier': openSupplier(parameter); break;
+    case 'new-supplier': openSupplier(null); break;
+    case 'delete':
+      openDialog('<h3 id="dialog-title">「' + escapeHtml(items.find(i => i.id === activeItem).name) + '」を削除しますか？</h3>' +
+        '<p class="notice">この仕入れ日の一覧から削除されます。</p>' +
+        button('キャンセル','close','primary') + button('削除する','confirm-delete','red'));
+      break;
+    case 'confirm-delete':
+      items.splice(items.findIndex(i => i.id === activeItem),1);
+      called.delete(activeItem);
+      activeItem = items.length ? items[0].id : null;
+      navigate('buy',true);
+      break;
+    case 'export': exportBackup(); break;
+    case 'confirm-import':
+      try { applyData(pendingImport); pendingImport = null; setDay(autoDay); navigate('plan'); }
+      catch (e) { openDialog('<h3 id="dialog-title">戻せませんでした</h3><p class="notice">' + escapeHtml(e.message) + '</p>' + button('閉じる','close','primary')); }
+      break;
+    case 'close': closeDialog(); break;
+  }
+}
+
+document.addEventListener('click', event => {
+  const tab = event.target.closest('[data-review]');
+  const control = event.target.closest('[data-action]');
+  if (!layer.hidden && !layer.contains(event.target)) return;
+  if (tab) {
+    const target = tab.dataset.review;
+    if (target === 'finish') finishCheck();
+    else navigate(target);
+  } else if (control) {
+    action(control.dataset.action);
+  }
+});
+
+document.addEventListener('input', event => {
+  if (event.target.id === 'food-name') showSuggestions();
+  if (event.target.id === 'purchase-note') {
+    document.querySelector('#memo-error').hidden = true;
+    event.target.removeAttribute('aria-invalid');
+  }
+});
+
+document.addEventListener('change', event => {
+  const control = event.target;
+  if (control.id === 'import-file') {
+    if (control.files && control.files[0]) readImport(control.files[0]);
+    control.value = '';
+    return;
+  }
+  if (control.id === 'day-pick' && control.value) {
+    const [y,m,d] = control.value.split('-').map(Number);
+    setDay(new Date(y, m - 1, d));
+    render();
+    return;
+  }
+  if (!control.dataset.unit) return;
+  const input = document.querySelector('#' + control.dataset.unit + '-custom');
+  input.hidden = control.value !== 'custom';
+  if (!input.hidden) input.focus();
+});
+
+document.addEventListener('keydown', event => {
+  if (layer.hidden) return;
+  if (event.key === 'Escape') closeDialog();
+  if (event.key !== 'Tab') return;
+  const controls = [...layer.querySelectorAll('button, input, select, textarea')];
+  const active = document.activeElement;
+  if (!controls.includes(active) || (event.shiftKey ? active === controls[0] : active === controls[controls.length-1])) {
+    event.preventDefault();
+    controls[event.shiftKey ? controls.length-1 : 0].focus();
+  }
+});
+
+function field(data,key) {
+  return String(data.get(key) || '').trim();
+}
+function getUnit(data) {
+  return field(data,'unit') === 'custom' ? field(data,'custom') : field(data,'unit');
+}
+
+document.addEventListener('submit', event => {
+  event.preventDefault();
+  const form = event.target;
+  const data = new FormData(form);
+  // Qt's local review renderer predates SubmitEvent.submitter.
+  const submitter = event.submitter || document.activeElement;
+  if (form.id === 'add-form') {
+    const name = field(data,'food');
+    if (!name) {
+      const input = form.elements.food;
+      input.value = '';
+      input.reportValidity();
+      return;
+    }
+    const values = {supplier:field(data,'supplier'), name,
+      quantity:field(data,'quantity'), unit:getUnit(data), note:field(data,'note'), call:field(data,'call') === 'yes'};
+    if (!priorNames.includes(name)) priorNames.unshift(name);
+    if (editingId) {
+      const it = items.find(i => i.id === editingId);
+      Object.assign(it, values);
+      if (!it.call) called.delete(it.id);
+      editingId = null;
+      navigate('plan');
+      return;
+    }
+    items.push(Object.assign({id:nextId++, state:'pending'}, values));
+    navigate(submitter.value === 'continue' ? 'add' : addBack);
+  } else if (form.id === 'edit-form') {
+    const state = submitter.value || 'bought';
+    const item = items.find(entry => entry.id === activeItem);
+    const memo = field(data,'memo');
+    if (state === 'substitute' && !memo) {
+      const error = document.querySelector('#memo-error');
+      error.textContent = '代わりに買った品をメモしてください。';
+      error.hidden = false;
+      form.elements.memo.setAttribute('aria-invalid','true');
+      form.elements.memo.focus();
+      return;
+    }
+    const purchased = state === 'bought' || state === 'substitute';
+    Object.assign(item,{state,actual:purchased ? field(data,'actual') : '',
+      actualUnit:purchased ? getUnit(data) : '',memo:state === 'pending' ? '' : memo});
+    navigate('buy',true);
+  } else if (form.id === 'shop-form') {
+    shopName = field(data,'shop');
+    render();
+    showUndo('お店の名前を保存しました', null);
+  } else if (form.id === 'supplier-form') {
+    const name = field(data,'name');
+    if (!name) {
+      form.elements.name.value = '';
+      form.elements.name.reportValidity();
+      return;
+    }
+    const replacement = {name,area:field(data,'area'),phone:field(data,'phone')};
+    if (activeSupplier) {
+      Object.assign(activeSupplier,replacement);
+    } else {
+      suppliers.push(Object.assign({id:'supplier-' + nextId++},replacement));
+    }
+    navigate('suppliers');
+  }
+});
+
+render();
+</script>
+</body>
+</html>
